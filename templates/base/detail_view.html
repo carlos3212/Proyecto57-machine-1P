@@ -1,0 +1,100 @@
+{% load static i18n %}<!DOCTYPE html>
+<html lang="en">
+{# tomado de https://getbootstrap.com/docs/4.0/examples/checkout/ #}
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" type="image/png" href="{% static 'base/img/inteligencia-artificial.png' %}"/>
+  <link rel="icon" type="image/svg" href="https://www.flaticon.es/svg/static/icons/svg/1122/1122567.svg"/>
+
+  <title>Landing Page - Start Bootstrap Theme</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static 'base/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <!-- Custom fonts for this template -->
+  <link href="{% static 'base/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+  <link href="{% static 'base/vendor/simple-line-icons/css/simple-line-icons.css' %}" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet"
+        type="text/css">
+
+  <!-- Custom styles for this template -->
+  <link href="{% static 'base/' %}css/landing-page.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-light bg-light static-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'base:home' %}">{% trans 'Home' %}</a>
+  </div>
+</nav>
+
+<!-- Masthead -->
+
+<div class="container">
+  <div class="card mb-3">
+    <div class="card-header">{{ source.title }}</div>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <img src="https://core.ac.uk/image/{{ source.id }}/large" id="preview_image" alt="Article thumbnail">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h2 class="card-title" style="font-weight: bold;">{{ source.title}}</h2>
+          <p>
+            <strong>Autor:</strong> {% for author in source.authors_m2m.all %}{{ author }}{% endfor %}
+          </p>
+          <h4>Abstract</h4>
+          <p class="card-text text-justify">{{ source.description|default_if_none:"" }}</p>
+          <strong>Repositorio:
+            {% for repository in source.repositories_m2m.all %}
+              <a href="{% url 'base:home' %}?q=repositories.id:({{ repository.pk }})">{{ repository }}</a>
+            {% endfor %}
+            <p>
+              <strong>Topics: </strong> <span class="text-dark">{{ source.topics_m2m.all|join:", " }}</span>
+            </p>
+          <p>
+            <strong>Año: </strong>{{ source.year }}<br>
+            {% if source.doi %}<strong class="text-uppercase">doi: </strong>{{ source.doi|default_if_none:"" }}<br>{% endif %}
+            {% if source.oai %}<strong class="text-uppercase">oai: </strong>{{ source.oai|default_if_none:"" }}<br>{% endif %}
+            {% if source.fullTextIdentifier %}<strong>Descargado desde</strong><br>
+            <a href="{{ source.fullTextIdentifier }}" target="_blank">{{ source.fullTextIdentifier }}</a>{% endif %}
+          </p>
+          <p class="card-text"><small class="text-muted">Actualizado hace {{ source.write_date|timesince }}</small></p>
+          </strong>
+        </div>
+        <div class="card-body">
+          {% if source.downloadUrl %}<a href="{{ source.downloadUrl }}" class="btn btn-outline-primary"> <i class="fa fa-1x fa-download"></i> Descargar</a>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <h2 class="blog-post-title">Artículos similares</h2>
+  <div class="row">
+    {% for record in sources %}
+    <div class="col-md-12">
+      <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+          <a href="{% url 'base:home' %}?q=repositories.id:({{ record.repositoryId }})" class="text-success">{{ record.repositoryName }}</a>
+          <h3 class="mb-0">
+            <a class="text-primary" href="{% url 'base:detail' record.pk %}" id="title" title="{{ record.title }}">{{ record.title|truncatewords:10 }}</a>
+          </h3>
+          <div class="mb-1 text-muted"><strong>Por:</strong> {% for author in source.authors_m2m.all %}{{ author }}{% endfor %}</div>
+          {% if record.year %}<div class="mb-1 text-muted">{{ record.year }}</div>{% endif %}
+          {% if record.publisher %}<p class="mb-auto"><strong>Editor: </strong>{{ record.publisher }}</p>{% endif %}
+        </div>
+        <div class="col-auto d-none d-lg-block">
+          <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="https://core.ac.uk/image/{{ record.id }}/medium" data-holder-rendered="true">
+        </div>
+      </div>
+    </div>{% endfor %}
+  </div>
+</div>
+</body>
+</html>
